@@ -1,0 +1,10 @@
+# Apple Silicon (MLX) Voice Cloning Dependencies
+mlx>=0.18.1
+mlx-metal>=0.18.1
+f5-tts-mlx>=0.2.6
+vocos-mlx>=0.0.7
+soundfile>=0.12.1
+sounddevice>=0.4.6
+numpy>=1.26.0
+tqdm>=4.66.0
+huggingface_hub>=0.24.0
