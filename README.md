@@ -1,137 +1,233 @@
-# LocalVoiceTranslate 🎙️
+> **Pipeline audit update (2026-09-27):** The original model stack does not reliably support the claimed Urdu/English cloned-call behavior. See [the investigation, new setup, tests, and measured limitations](docs/pipeline-investigation.md). Voice enrollment is now required; bundled demo recordings are not caller identities. Urdu output is explicitly blocked by the default F5 backend rather than transliterated into incorrect speech. NLLB replaces the known-failing Marian translation default. The optional OmniVoice adapter needs a separate environment and real model validation. Restart the backend and both clients for the new call-ID protocol. Older stage descriptions below are historical, not current acceptance results.
 
-Real-time voice translation using **locally running AI models** for speech recognition, translation, text-to-speech, and voice cloning.
+# Real-Time Translated Voice Calling App with Consent-Based Voice Cloning 🎙️
 
-The goal of this project is to experiment with running the complete speech translation pipeline locally instead of depending on paid cloud APIs.
+A local, offline proof-of-concept demonstrating real-time bidirectional translated voice calls with zero-shot voice cloning, fully accelerated on **Apple Silicon (M1/M2/M3/M4 MacBook Pro)**.
 
-## How It Works
+- **Zero Cloud / Paid APIs**: Runs 100% locally.
+- **Hardware Acceleration**: Apple MLX + Metal Performance Shaders (GPU). No CUDA/NVIDIA GPU required.
+- **Bidirectional Calling**: User A speaks **Urdu** ➔ User B hears **English** in User A's cloned voice; User B speaks **English** ➔ User A hears **Urdu** in User B's cloned voice.
+- **Utterance-Based Translation**: Speak ➔ Pause/Release ➔ STT ➔ NMT ➔ Voice Clone TTS ➔ Remote Playback.
 
-```text
-Microphone Input
-      ↓
-Speech-to-Text
-      ↓
-Language Detection
-      ↓
-Translation
-      ↓
-TTS / Voice Cloning
-      ↓
-Translated Audio Output
-```
+---
 
-You speak in one language, the application captures the audio and sends it through the local processing pipeline.
-
-The speech is first transcribed, translated into the selected target language, and then converted back into speech using TTS or a cloned voice.
-
-## Technical Implementation
-
-The project combines multiple AI/audio components into one pipeline:
-
-**Speech-to-Text (STT)**  
-Audio captured from the microphone is processed by a locally running speech recognition model to generate a transcription.
-
-**Translation**  
-The transcription is passed through the translation layer to produce text in the selected target language.
-
-**Text-to-Speech (TTS)**  
-Translated text is synthesized back into audio using a local TTS model.
-
-**Voice Cloning**  
-A reference voice sample can be used by the speech synthesis model to generate translated speech while preserving characteristics of the original speaker's voice.
-
-**Audio Pipeline**  
-The application manages recording, audio preprocessing, model inference, generated audio, playback, and state transitions between each stage.
-
-## Why Local Models?
-
-Running the models locally provides a useful environment for experimenting with:
-
-- Offline AI inference
-- Speech processing
-- Machine translation
-- Voice synthesis
-- Voice cloning
-- AI pipeline orchestration
-- Latency optimization
-- Reduced dependency on paid APIs
-- Greater control over audio data
-
-## Main Challenge
-
-The interesting part of this project isn't the UI — it's connecting several AI models into a usable speech pipeline.
-
-Each stage has different input/output requirements and inference times:
+## Architecture Overview
 
 ```text
-Audio
-  → STT inference
-  → Transcribed text
-  → Translation inference
-  → Translated text
-  → TTS / Voice Clone inference
-  → Generated audio
-  → Playback
+User A (Flutter Client)                      AI Backend Server (Apple Silicon MLX)                     User B (Flutter Client)
+┌──────────────────────┐                     ┌───────────────────────────────────┐                     ┌──────────────────────┐
+│ Speaks Urdu:         │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Hears English in     │
+│ "تم کیا کر رہے ہو؟"  │ ──────────────────> │    "کیا کر رہی ہو؟" (1.4s)        │ ──────────────────> │ User A's Cloned      │
+│                      │                     │ 2. NMT (MarianMT):                │                     │ Voice:               │
+│                      │                     │    "What are you doing?" (130ms)  │                     │ "What are you doing?"│
+│                      │                     │ 3. Voice Clone TTS (F5-TTS MLX):  │                     │                      │
+│                      │                     │    Using User A Reference (2.9s)  │                     │                      │
+└──────────────────────┘                     └───────────────────────────────────┘                     └──────────────────────┘
+                                                               ▲
+                                                               │ Reverse Direction
+                                                               ▼
+┌──────────────────────┐                     ┌───────────────────────────────────┐                     ┌──────────────────────┐
+│ Hears Urdu in        │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Speaks English:      │
+│ User B's Cloned      │ <────────────────── │    "Where are you going?" (180ms) │ <────────────────── │ "Where are you going"│
+│ Voice:               │                     │ 2. NMT (MarianMT):                │                     │                      │
+│ "تم کہاں جا رہے ہو؟" │                     │    "تم کہاں جا رہے ہو؟" (130ms)   │                     │                      │
+│                      │                     │ 3. Voice Clone TTS (F5-TTS MLX):  │                     │                      │
+│                      │                     │    Using User B Reference (2.8s)  │                     │                      │
+└──────────────────────┘                     └───────────────────────────────────┘                     └──────────────────────┘
 ```
 
-Keeping this pipeline responsive while handling recording, model processing, errors, and playback is one of the main engineering challenges explored in the project.
+---
 
-## Features
+## Measured Performance & Latency (M1 MacBook Pro)
 
-- 🎙️ Microphone audio capture
-- 📝 Local speech-to-text
-- 🌍 Multi-language translation
-- 🔊 Local text-to-speech
-- 🗣️ Voice cloning
-- 🔄 End-to-end speech translation pipeline
-- ⚡ Focus on low-latency inference
-- 💻 Local model execution
-- ☁️ No paid AI API required for the core pipeline
+| Pipeline Stage | Model & Framework | Compute Device | Typical Warm Latency |
+| :--- | :--- | :--- | :--- |
+| **STT (Urdu / English)** | `mlx-community/whisper-tiny` | Apple Silicon GPU (MLX) | **180 ms – 1,450 ms** |
+| **Translation (NMT)** | `Helsinki-NLP/opus-mt-ur-en` & `en-ur` | CPU (Torch / SentencePiece) | **130 ms – 180 ms** |
+| **Voice Cloning (TTS)** | `lucasnewman/f5-tts-mlx` + `vocos-mlx` | Apple Silicon GPU (Metal) | **2,570 ms – 3,200 ms** (4 steps) |
+| **Total Turnaround** | Full Utterance Processing Pipeline | Apple Silicon Unified Memory | **~3.2 s – 4.0 s** |
 
-## Architecture
+---
 
-The application layer handles the user interaction and audio lifecycle, while local AI services are responsible for model inference.
+## Project Structure
 
 ```text
-┌──────────────────────┐
-│     Application      │
-│   UI + Audio Input   │
-└──────────┬───────────┘
-           │ Audio
-           ▼
-┌──────────────────────┐
-│  Local AI Services   │
-├──────────────────────┤
-│ Speech Recognition   │
-│ Translation          │
-│ TTS / Voice Cloning  │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│  Generated Speech    │
-│      Playback        │
-└──────────────────────┘
+translation_call_demo/
+├── lib/
+│   └── main.dart                     # Flutter application (Home Screen & Call Screen)
+├── macos/                            # macOS desktop runner with audio/network entitlements
+├── ai_server/
+│   ├── server.py                     # FastAPI REST API & WebSocket Real-time Call Hub
+│   ├── stt.py                        # Speech-to-Text service interface & MLX Whisper implementation
+│   ├── translator.py                 # Bidirectional Translation service & MarianMT implementation
+│   ├── voice_clone.py                # Voice Cloning service interface & F5-TTS MLX implementation
+│   ├── pipeline.py                   # TranslationCallPipeline orchestrator & latency logger
+│   ├── samples/
+│   │   ├── user_a.wav                # User A voice enrollment reference (24kHz mono WAV)
+│   │   ├── user_a.txt                # User A reference transcript
+│   │   ├── user_b.wav                # User B voice enrollment reference (24kHz mono WAV)
+│   │   └── user_b.txt                # User B reference transcript
+│   ├── outputs/                      # Generated synthesized call audio
+│   ├── requirements.txt              # Python dependencies
+│   ├── test_stage1.py                # Stage 1 test: Voice clone proof
+│   ├── test_stage2.py                # Stage 2 test: Urdu speech recognition
+│   ├── test_stage3.py                # Stage 3 test: Urdu <-> English translation
+│   ├── test_stage4.py                # Stage 4 test: Complete AI pipeline
+│   ├── test_stage5.py                # Stage 5 test: Local API & WebSocket
+│   └── test_stage7_two_clients.py    # Stage 7 test: Two-client translated call simulation
+├── pubspec.yaml                      # Flutter dependencies
+└── README.md
 ```
 
-## Project Goal
+---
 
-This is an experimental/open-source project built to understand how modern speech AI models can be combined into a practical application.
+## Setup Instructions (M1 MacBook Pro)
 
-Rather than treating STT, translation, and TTS as isolated demos, the project connects them into an end-to-end system:
+### 1. Homebrew Requirements
 
-**Speak → Understand → Translate → Recreate Voice → Listen**
+Install `ffmpeg` for high-performance audio conversion and resampling:
 
-## Status
+```bash
+brew install ffmpeg
+```
 
-🚧 **Experimental / Active Development**
+### 2. Python Version & Virtual Environment
 
-The project is primarily intended for experimentation, learning, and demonstrating local speech AI integration. Latency and output quality depend heavily on the models and hardware being used.
+Native macOS Apple Silicon Python 3.9+ is supported:
 
-## Disclaimer
+```bash
+cd /Users/mac/StudioProjects/translation_call_demo
 
-Voice cloning should only be used with your own voice or with the explicit permission of the person whose voice is being used.
+# Create virtual environment
+python3 -m venv ai_server/venv
+source ai_server/venv/bin/activate
+```
 
-## License
+### 3. Install Required Python Packages
 
-Open source. See the repository's `LICENSE` file for details.
+```bash
+pip install -r ai_server/requirements.txt
+```
+
+### 4. AI Model Weights
+
+Model weights download automatically upon first run and are cached locally in `~/.cache/huggingface`:
+- **Voice Cloning**: `lucasnewman/f5-tts-mlx` + `vocos-mlx`
+- **Speech Recognition**: `mlx-community/whisper-tiny`
+- **Translation**: `Helsinki-NLP/opus-mt-ur-en` and `Helsinki-NLP/opus-mt-en-ur`
+
+### 5. Flutter Dependencies
+
+Install Flutter dependencies:
+
+```bash
+flutter pub get
+```
+
+---
+
+## Verifying Each Stage (Step-by-Step)
+
+Each stage can be verified independently with automated verification scripts:
+
+```bash
+# Activate virtual environment
+source ai_server/venv/bin/activate
+export PYTHONPATH=ai_server
+
+# Stage 1: Voice Clone Proof (Generates ai_server/outputs/output.wav)
+python3 ai_server/test_stage1.py
+
+# Stage 2: Urdu Speech Recognition (Transcribes Urdu audio -> Urdu text)
+python3 ai_server/test_stage2.py
+
+# Stage 3: Bidirectional Translation (Urdu <-> English)
+python3 ai_server/test_stage3.py
+
+# Stage 4: Complete AI Pipeline (STT -> NMT -> Cloned Voice TTS)
+python3 ai_server/test_stage4.py
+
+# Stage 5: Local API & WebSocket Server
+python3 ai_server/test_stage5.py
+
+# Stage 7: Two-Client Call Simulation
+python3 ai_server/test_stage7_two_clients.py
+```
+
+---
+
+## How to Enroll a User Voice
+
+Voice cloning is **strictly consent-based**. Each user must enroll their own voice by recording approximately 5–30 seconds of clean speech.
+
+### Option A: Via Command Line / File System
+Save a clean mono 24 kHz WAV file to:
+```text
+ai_server/samples/<speaker_id>.wav
+ai_server/samples/<speaker_id>.txt  (transcript of what was spoken)
+```
+Convert existing audio with `ffmpeg`:
+```bash
+ffmpeg -i my_recording.wav -ac 1 -ar 24000 ai_server/samples/user_a.wav
+```
+
+### Option B: Via REST API
+```bash
+curl -X POST http://localhost:8000/api/enroll-voice \
+  -F "speaker_id=user_a" \
+  -F "audio=@/path/to/my_recording.wav" \
+  -F "ref_text=Some call me nature, others call me mother nature."
+```
+
+---
+
+## Running the Application
+
+### Step 1: Start the AI Backend Server
+
+```bash
+cd /Users/mac/StudioProjects/translation_call_demo
+source ai_server/venv/bin/activate
+export PYTHONPATH=ai_server
+python3 ai_server/server.py
+```
+The server will bind to `http://0.0.0.0:8000` and pre-warm models into M1 unified memory.
+
+Verify health:
+```bash
+curl http://localhost:8000/api/health
+```
+
+---
+
+### Step 2: Run Two Flutter Clients for Testing
+
+You can run two clients on the same M1 Mac simultaneously:
+
+#### Client 1 (User A — macOS Desktop App):
+```bash
+flutter run -d macos
+```
+1. Select **User A (Urdu Speaker)** on the home screen.
+2. Verify the backend indicator shows **AI Backend Online**.
+3. Click **CALL USER B**.
+
+#### Client 2 (User B — Google Chrome Web App):
+Open a new terminal window:
+```bash
+flutter run -d chrome
+```
+1. Select **User B (English Speaker)** on the home screen.
+2. Verify the backend indicator shows **AI Backend Online**.
+3. Accept the incoming call or initiate the call with User A.
+
+---
+
+## Audio Feedback & Loop Prevention
+
+When both users are on the same machine or using open speakers:
+1. **Push-to-Talk (Hold to Speak)**: The app records speech when held and immediately releases when done.
+2. **Playback Muting**: The client automatically pauses microphone capture during translated speech playback.
+3. **Demo Utterance Buttons**: Quick-action buttons allow testing both directions without wearing headphones:
+   - User A: `[Send Demo Urdu: "تم کیا کر رہے ہو؟"]`
+   - User B: `[Send Demo English: "Where are you going?"]`

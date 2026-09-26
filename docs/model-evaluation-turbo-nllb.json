@@ -1,0 +1,117 @@
+{
+  "stt_model": "mlx-community/whisper-large-v3-turbo",
+  "translation_model": "NLLBTranslationService",
+  "stt": [
+    {
+      "audio": "ai_server/outputs/ws_in_user_a_1790455066307.wav",
+      "expected": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "wer": 0.26666666666666666,
+      "text": "میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں",
+      "detected_language": "ur",
+      "language_mode": "configured",
+      "avg_logprob": -0.1572495074499221,
+      "no_speech_probability": 8.344128166193343e-10,
+      "elapsed_seconds": 1.867436208,
+      "raw_text": " میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں"
+    },
+    {
+      "audio": "ai_server/outputs/evaluation_english_amjad.wav",
+      "expected": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "wer": 0.0,
+      "text": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "detected_language": "en",
+      "language_mode": "configured",
+      "avg_logprob": -0.09618927084881326,
+      "no_speech_probability": 9.686318587498466e-13,
+      "elapsed_seconds": 1.1558205420000007,
+      "raw_text": " My name is Amjad and I work as a tailor. Do you recognize me?"
+    },
+    {
+      "audio": "ai_server/outputs/ws_in_user_a_1790455066307.wav",
+      "expected": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "wer": 0.26666666666666666,
+      "text": "میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں",
+      "detected_language": "ur",
+      "language_mode": "configured",
+      "avg_logprob": -0.1572495074499221,
+      "no_speech_probability": 8.344128166193343e-10,
+      "elapsed_seconds": 1.2212843749999998,
+      "raw_text": " میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں"
+    }
+  ],
+  "translation": [
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں",
+      "output": "My name is Amjad and I work as a tailor.",
+      "seconds": 6.649297040999999,
+      "from_audio": true
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "output": "میرا نام امجد ہے اور میں ایک ٹیلر کے طور پر کام کرتا ہوں. کیا آپ مجھے پہچانتے ہیں؟",
+      "seconds": 5.2140235829999995,
+      "from_audio": true
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں صلائی کا کام کرتا ہوں کیا آپ مجھے پہ چانتے ہیں",
+      "output": "My name is Amjad and I work as a tailor.",
+      "seconds": 1.8251753330000007,
+      "from_audio": true
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "My name is Amjad and I work as a seamstress. Do you recognize me?",
+      "seconds": 8.512992125000004,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "output": "میرا نام امجد ہے اور میں ایک ٹیلر کے طور پر کام کرتا ہوں. کیا آپ مجھے پہچانتے ہیں؟",
+      "seconds": 3.297228666999999,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "The weather is pleasant today.",
+      "output": "آج موسم خوشگوار ہے۔",
+      "seconds": 0.9349130410000015,
+      "from_audio": false
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "My name is Amjad and I work as a seamstress. Do you recognize me?",
+      "seconds": 2.7729153749999966,
+      "from_audio": false
+    },
+    {
+      "source": "ur",
+      "target": "ur",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "seconds": 0.0,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "en",
+      "input": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "output": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "seconds": 0.0,
+      "from_audio": false
+    }
+  ],
+  "notice": "WER is diagnostic; semantic/voice quality requires review"
+}

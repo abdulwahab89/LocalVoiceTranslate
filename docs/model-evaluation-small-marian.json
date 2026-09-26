@@ -1,0 +1,117 @@
+{
+  "stt_model": "mlx-community/whisper-small-mlx",
+  "translation_model": "MarianTranslationService",
+  "stt": [
+    {
+      "audio": "ai_server/outputs/ws_in_user_a_1790455066307.wav",
+      "expected": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "wer": 0.2,
+      "text": "میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں",
+      "detected_language": "ur",
+      "language_mode": "configured",
+      "avg_logprob": -0.3115239476048669,
+      "no_speech_probability": 0.02812095917761326,
+      "elapsed_seconds": 1.3583799580000004,
+      "raw_text": " میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں"
+    },
+    {
+      "audio": "ai_server/samples/english_sentence.wav",
+      "expected": "Where are you going?",
+      "wer": 0.0,
+      "text": "Where are you going?",
+      "detected_language": "en",
+      "language_mode": "configured",
+      "avg_logprob": -0.29141366481781006,
+      "no_speech_probability": 0.007387699093669653,
+      "elapsed_seconds": 0.17341424999999955,
+      "raw_text": " Where are you going?"
+    },
+    {
+      "audio": "ai_server/outputs/ws_in_user_a_1790455066307.wav",
+      "expected": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "wer": 0.2,
+      "text": "میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں",
+      "detected_language": "ur",
+      "language_mode": "configured",
+      "avg_logprob": -0.3115239476048669,
+      "no_speech_probability": 0.02812095917761326,
+      "elapsed_seconds": 0.3262914159999992,
+      "raw_text": " میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں"
+    }
+  ],
+  "translation": [
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں",
+      "output": "It's my name, and I'll do it. Do you follow me?",
+      "seconds": 0.6133239269256592,
+      "from_audio": true
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "Where are you going?",
+      "output": "تم کہاں جا رہے ہو؟",
+      "seconds": 0.19176506996154785,
+      "from_audio": true
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلاحی کا کام کرتا ہوں کیا آپ مجھے پیچھانتے ہیں",
+      "output": "It's my name, and I'll do it. Do you follow me?",
+      "seconds": 0.44154906272888184,
+      "from_audio": true
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "My name is Cycle and I'm acting. Do you know me?",
+      "seconds": 0.4312570095062256,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "output": "کیا آپ مجھے پہچان رہے ہیں ؟",
+      "seconds": 0.17875981330871582,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "ur",
+      "input": "The weather is pleasant today.",
+      "output": "آجکل موسم خوشگوار ہے ۔",
+      "seconds": 0.18808984756469727,
+      "from_audio": false
+    },
+    {
+      "source": "ur",
+      "target": "en",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "My name is Cycle and I'm acting. Do you know me?",
+      "seconds": 0.4261631965637207,
+      "from_audio": false
+    },
+    {
+      "source": "ur",
+      "target": "ur",
+      "input": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "output": "میرا نام امجد ہے اور میں سلائی کا کام کرتا ہوں۔ آپ مجھے پہچانتے ہیں؟",
+      "seconds": 0.0,
+      "from_audio": false
+    },
+    {
+      "source": "en",
+      "target": "en",
+      "input": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "output": "My name is Amjad and I work as a tailor. Do you recognize me?",
+      "seconds": 0.0,
+      "from_audio": false
+    }
+  ],
+  "notice": "WER is diagnostic; semantic/voice quality requires review"
+}

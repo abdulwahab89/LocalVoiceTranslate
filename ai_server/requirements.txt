@@ -8,3 +8,20 @@ sounddevice>=0.4.6
 numpy>=1.26.0
 tqdm>=4.66.0
 huggingface_hub>=0.24.0
+
+# Apple Silicon (MLX) Speech Recognition (STT) Dependencies
+mlx-whisper>=0.4.0
+tiktoken>=0.7.0
+scipy>=1.11.0
+
+# API Server & Communication Dependencies
+fastapi>=0.110.0
+uvicorn>=0.28.0
+python-multipart>=0.0.9
+websockets>=12.0
+
+# Local translation models
+transformers>=4.46,<5
+torch>=2.2
+sentencepiece>=0.2
+sacremoses>=0.1

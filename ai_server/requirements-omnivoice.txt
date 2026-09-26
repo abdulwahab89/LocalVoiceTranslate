@@ -1,0 +1,2 @@
+# Separate Python >=3.10 environment; do not install into the MLX Python 3.9 env.
+omnivoice==0.2.1

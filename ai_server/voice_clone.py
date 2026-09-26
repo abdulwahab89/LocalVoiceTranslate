@@ -13,6 +13,7 @@ import time
 from typing import Optional, Tuple
 
 import mlx.core as mx
+from audio_utils import read_audio
 import numpy as np
 import soundfile as sf
 
@@ -40,7 +41,8 @@ class VoiceCloningService(ABC):
         ref_audio_path: str,
         ref_text: Optional[str] = None,
         output_path: Optional[str] = None,
-        steps: int = 6,
+        steps: int = 8,
+        language: str = "en",
     ) -> Tuple[str, float]:
         """
         Synthesize speech in the target voice of ref_audio_path.
@@ -64,10 +66,13 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
     Directly utilizes Apple Silicon GPU via Metal Performance Shaders / MLX.
     """
 
+    supported_languages = frozenset({"en", "de", "es", "fr", "zh"})
+    supported_reference_languages = supported_languages
+
     def __init__(
         self,
         model_name: str = "lucasnewman/f5-tts-mlx",
-        default_steps: int = 6,
+        default_steps: int = 8,
     ):
         self.model_name = model_name
         self.default_steps = default_steps
@@ -83,24 +88,7 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
         if not os.path.exists(ref_audio_path):
             raise FileNotFoundError(f"Reference voice audio file not found: {ref_audio_path}")
 
-        audio, sr = sf.read(ref_audio_path)
-        # Convert stereo to mono if necessary
-        if audio.ndim > 1:
-            audio = np.mean(audio, axis=1)
-
-        # Resample if sample rate doesn't match 24kHz
-        if sr != self.target_sample_rate:
-            logger.warning(
-                f"Reference audio sample rate {sr}Hz != {self.target_sample_rate}Hz. Resampling."
-            )
-            # Resample using linear interpolation or numpy
-            duration = len(audio) / sr
-            target_length = int(duration * self.target_sample_rate)
-            audio = np.interp(
-                np.linspace(0, len(audio), target_length, endpoint=False),
-                np.arange(len(audio)),
-                audio,
-            )
+        audio = read_audio(ref_audio_path, self.target_sample_rate)
 
         audio_mx = mx.array(audio, dtype=mx.float32)
 
@@ -118,8 +106,11 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
         ref_text: Optional[str] = None,
         output_path: Optional[str] = None,
         steps: Optional[int] = None,
+        language: str = "en",
     ) -> Tuple[str, float]:
         """Generates cloned speech for the given text using reference voice audio."""
+        if language not in self.supported_languages:
+            raise ValueError(f"F5-TTS does not support target language {language}; no fallback voice is allowed")
         if not text or not text.strip():
             raise ValueError("Input text cannot be empty.")
 
@@ -140,7 +131,9 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
             if companion_txt.exists():
                 ref_text = companion_txt.read_text(encoding="utf-8").strip()
             else:
-                ref_text = "Some call me nature, others call me mother nature."
+                raise ValueError("Exact reference transcript is required; no default transcript is allowed")
+        if not ref_text.strip():
+            raise ValueError("Reference transcript cannot be empty")
 
         logger.info(f"Synthesizing '{text}' (steps={num_steps}) with ref voice '{ref_audio_path}'")
         t_start = time.time()
@@ -149,6 +142,8 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
         ref_audio_samples = ref_audio.shape[0]
 
         sentences = split_sentences(text)
+        if not sentences or all(not s.strip() for s in sentences):
+            sentences = [text.strip()]
         outputs = []
 
         for sentence in sentences:
@@ -157,11 +152,14 @@ class F5TTSMLXVoiceCloningService(VoiceCloningService):
 
             full_prompt = f"{ref_text} {sentence}"
             pinyin_text = convert_char_to_pinyin([full_prompt])
+            est_dur = estimated_duration(ref_audio, ref_text, sentence, 1.0)
+            target_frames = int(est_dur * FRAMES_PER_SEC)
 
             # Generate waveform with MLX
             wave, _ = self.model.sample(
                 mx.expand_dims(ref_audio, axis=0),
                 text=pinyin_text,
+                duration=target_frames,
                 steps=num_steps,
                 method="rk4",
                 speed=1.0,

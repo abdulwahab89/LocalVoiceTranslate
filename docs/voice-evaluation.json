@@ -1,0 +1,58 @@
+[
+  {
+    "call_id": "voice_evaluation",
+    "speaker_id": "fixture_user_a",
+    "segment_id": "1",
+    "source_language": "en",
+    "target_language": "en",
+    "transcript": "Where are you going?",
+    "translated_text": "Where are you going?",
+    "output_audio_path": "/Users/mac/StudioProjects/translation_call_demo/ai_server/outputs/evaluation_user_a.wav",
+    "metrics": {
+      "stt_ms": 997.0,
+      "translation_ms": 0.1,
+      "tts_ms": 34712.9,
+      "total_ms": 36088.3
+    },
+    "status": "success",
+    "voice_state": "READY",
+    "voice_profile_id": "bb1418eefcef4717a2ce1b2256db8bb6",
+    "output_stt": {
+      "text": "Where are you going?",
+      "detected_language": "en",
+      "language_mode": "configured",
+      "avg_logprob": -0.3931267261505127,
+      "no_speech_probability": 0.025791693478822708,
+      "elapsed_seconds": 0.664107125000001,
+      "raw_text": " Where are you going?"
+    }
+  },
+  {
+    "call_id": "voice_evaluation",
+    "speaker_id": "fixture_user_b",
+    "segment_id": "2",
+    "source_language": "en",
+    "target_language": "en",
+    "transcript": "Where are you going?",
+    "translated_text": "Where are you going?",
+    "output_audio_path": "/Users/mac/StudioProjects/translation_call_demo/ai_server/outputs/evaluation_user_b.wav",
+    "metrics": {
+      "stt_ms": 161.6,
+      "translation_ms": 0.1,
+      "tts_ms": 24130.5,
+      "total_ms": 24293.3
+    },
+    "status": "success",
+    "voice_state": "READY",
+    "voice_profile_id": "84aa4f6d39d24ab9ac66108ad0af342d",
+    "output_stt": {
+      "text": "Where are you going?",
+      "detected_language": "en",
+      "language_mode": "configured",
+      "avg_logprob": -0.3484928607940674,
+      "no_speech_probability": 0.015911616384983063,
+      "elapsed_seconds": 0.6471087089999941,
+      "raw_text": " Where are you going?"
+    }
+  }
+]

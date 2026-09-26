@@ -55,3 +55,7 @@ venv/
 __pycache__/
 *.py[cod]
 .DS_Store
+
+# Explicitly enrolled personal voice references (never demo assets)
+ai_server/profiles/
+ai_server/.venv-omnivoice/
