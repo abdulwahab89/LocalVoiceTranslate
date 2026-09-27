@@ -1,4 +1,4 @@
-> **Pipeline audit update (2026-09-27):** The original model stack does not reliably support the claimed Urdu/English cloned-call behavior. See [the investigation, new setup, tests, and measured limitations](docs/pipeline-investigation.md). Voice enrollment is now required; bundled demo recordings are not caller identities. Urdu output is explicitly blocked by the default F5 backend rather than transliterated into incorrect speech. NLLB replaces the known-failing Marian translation default. The optional OmniVoice adapter needs a separate environment and real model validation. Restart the backend and both clients for the new call-ID protocol. Older stage descriptions below are historical, not current acceptance results.
+> **Pipeline audit update (2026-09-27):** The original model stack does not reliably support the claimed German/English cloned-call behavior. See [the investigation, new setup, tests, and measured limitations](docs/pipeline-investigation.md). Voice enrollment is now required; bundled demo recordings are not caller identities. German output is explicitly blocked by the default F5 backend rather than transliterated into incorrect speech. NLLB replaces the known-failing Marian translation default. The optional OmniVoice adapter needs a separate environment and real model validation. Restart the backend and both clients for the new call-ID protocol. Older stage descriptions below are historical, not current acceptance results.
 
 # Real-Time Translated Voice Calling App with Consent-Based Voice Cloning 🎙️
 
@@ -6,7 +6,7 @@ A local, offline proof-of-concept demonstrating real-time bidirectional translat
 
 - **Zero Cloud / Paid APIs**: Runs 100% locally.
 - **Hardware Acceleration**: Apple MLX + Metal Performance Shaders (GPU). No CUDA/NVIDIA GPU required.
-- **Bidirectional Calling**: User A speaks **Urdu** ➔ User B hears **English** in User A's cloned voice; User B speaks **English** ➔ User A hears **Urdu** in User B's cloned voice.
+- **Bidirectional Calling**: User A speaks **German** ➔ User B hears **English** in User A's cloned voice; User B speaks **English** ➔ User A hears **German** in User B's cloned voice.
 - **Utterance-Based Translation**: Speak ➔ Pause/Release ➔ STT ➔ NMT ➔ Voice Clone TTS ➔ Remote Playback.
 
 - <img width="2606" height="1604" alt="image" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
@@ -19,7 +19,7 @@ A local, offline proof-of-concept demonstrating real-time bidirectional translat
 ```text
 User A (Flutter Client)                      AI Backend Server (Apple Silicon MLX)                     User B (Flutter Client)
 ┌──────────────────────┐                     ┌───────────────────────────────────┐                     ┌──────────────────────┐
-│ Speaks Urdu:         │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Hears English in     │
+│ Speaks German:         │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Hears English in     │
 │ "تم کیا کر رہے ہو؟"  │ ──────────────────> │    "کیا کر رہی ہو؟" (1.4s)        │ ──────────────────> │ User A's Cloned      │
 │                      │                     │ 2. NMT (MarianMT):                │                     │ Voice:               │
 │                      │                     │    "What are you doing?" (130ms)  │                     │ "What are you doing?"│
@@ -30,7 +30,7 @@ User A (Flutter Client)                      AI Backend Server (Apple Silicon ML
                                                                │ Reverse Direction
                                                                ▼
 ┌──────────────────────┐                     ┌───────────────────────────────────┐                     ┌──────────────────────┐
-│ Hears Urdu in        │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Speaks English:      │
+│ Hears German in        │  WebSocket Audio    │ 1. STT (MLX Whisper):             │  WebSocket Audio    │ Speaks English:      │
 │ User B's Cloned      │ <────────────────── │    "Where are you going?" (180ms) │ <────────────────── │ "Where are you going"│
 │ Voice:               │                     │ 2. NMT (MarianMT):                │                     │                      │
 │ "تم کہاں جا رہے ہو؟" │                     │    "تم کہاں جا رہے ہو؟" (130ms)   │                     │                      │
@@ -45,7 +45,7 @@ User A (Flutter Client)                      AI Backend Server (Apple Silicon ML
 
 | Pipeline Stage | Model & Framework | Compute Device | Typical Warm Latency |
 | :--- | :--- | :--- | :--- |
-| **STT (Urdu / English)** | `mlx-community/whisper-tiny` | Apple Silicon GPU (MLX) | **180 ms – 1,450 ms** |
+| **STT (German / English)** | `mlx-community/whisper-tiny` | Apple Silicon GPU (MLX) | **180 ms – 1,450 ms** |
 | **Translation (NMT)** | `Helsinki-NLP/opus-mt-ur-en` & `en-ur` | CPU (Torch / SentencePiece) | **130 ms – 180 ms** |
 | **Voice Cloning (TTS)** | `lucasnewman/f5-tts-mlx` + `vocos-mlx` | Apple Silicon GPU (Metal) | **2,570 ms – 3,200 ms** (4 steps) |
 | **Total Turnaround** | Full Utterance Processing Pipeline | Apple Silicon Unified Memory | **~3.2 s – 4.0 s** |
@@ -73,8 +73,8 @@ translation_call_demo/
 │   ├── outputs/                      # Generated synthesized call audio
 │   ├── requirements.txt              # Python dependencies
 │   ├── test_stage1.py                # Stage 1 test: Voice clone proof
-│   ├── test_stage2.py                # Stage 2 test: Urdu speech recognition
-│   ├── test_stage3.py                # Stage 3 test: Urdu <-> English translation
+│   ├── test_stage2.py                # Stage 2 test: German speech recognition
+│   ├── test_stage3.py                # Stage 3 test: German <-> English translation
 │   ├── test_stage4.py                # Stage 4 test: Complete AI pipeline
 │   ├── test_stage5.py                # Stage 5 test: Local API & WebSocket
 │   └── test_stage7_two_clients.py    # Stage 7 test: Two-client translated call simulation
@@ -141,10 +141,10 @@ export PYTHONPATH=ai_server
 # Stage 1: Voice Clone Proof (Generates ai_server/outputs/output.wav)
 python3 ai_server/test_stage1.py
 
-# Stage 2: Urdu Speech Recognition (Transcribes Urdu audio -> Urdu text)
+# Stage 2: German Speech Recognition (Transcribes German audio -> German text)
 python3 ai_server/test_stage2.py
 
-# Stage 3: Bidirectional Translation (Urdu <-> English)
+# Stage 3: Bidirectional Translation (German <-> English)
 python3 ai_server/test_stage3.py
 
 # Stage 4: Complete AI Pipeline (STT -> NMT -> Cloned Voice TTS)
@@ -211,7 +211,7 @@ You can run two clients on the same M1 Mac simultaneously:
 ```bash
 flutter run -d macos
 ```
-1. Select **User A (Urdu Speaker)** on the home screen.
+1. Select **User A (German Speaker)** on the home screen.
 2. Verify the backend indicator shows **AI Backend Online**.
 3. Click **CALL USER B**.
 
@@ -232,5 +232,5 @@ When both users are on the same machine or using open speakers:
 1. **Push-to-Talk (Hold to Speak)**: The app records speech when held and immediately releases when done.
 2. **Playback Muting**: The client automatically pauses microphone capture during translated speech playback.
 3. **Demo Utterance Buttons**: Quick-action buttons allow testing both directions without wearing headphones:
-   - User A: `[Send Demo Urdu: "تم کیا کر رہے ہو؟"]`
+   - User A: `[Send Demo German: "تم کیا کر رہے ہو؟"]`
    - User B: `[Send Demo English: "Where are you going?"]`
