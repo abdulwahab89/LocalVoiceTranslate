@@ -9,6 +9,9 @@ A local, offline proof-of-concept demonstrating real-time bidirectional translat
 - **Bidirectional Calling**: User A speaks **Urdu** ➔ User B hears **English** in User A's cloned voice; User B speaks **English** ➔ User A hears **Urdu** in User B's cloned voice.
 - **Utterance-Based Translation**: Speak ➔ Pause/Release ➔ STT ➔ NMT ➔ Voice Clone TTS ➔ Remote Playback.
 
+- <img width="2606" height="1604" alt="image" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
+
+
 ---
 
 ## Architecture Overview
