@@ -1,4 +1,4 @@
-# Real-Time Translated Voice Calling with Consent-Based Zero-Shot Voice Cloning 🎙️
+# Real-Time Translated Voice Calling with Consent-Based Zero-Shot Voice Cloning 
 
 <img width="2606" height="1604" alt="Real-Time Translated Voice Calling Demo" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
 
