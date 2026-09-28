@@ -1,5 +1,3 @@
-> **Pipeline audit update (2026-09-27):** The original model stack does not reliably support the claimed German/English cloned-call behavior. See [the investigation, new setup, tests, and measured limitations](docs/pipeline-investigation.md). Voice enrollment is now required; bundled demo recordings are not caller identities. German output is explicitly blocked by the default F5 backend rather than transliterated into incorrect speech. NLLB replaces the known-failing Marian translation default. The optional OmniVoice adapter needs a separate environment and real model validation. Restart the backend and both clients for the new call-ID protocol. Older stage descriptions below are historical, not current acceptance results.
-
 # Real-Time Translated Voice Calling App with Consent-Based Voice Cloning 🎙️
 
 - <img width="2606" height="1604" alt="image" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
