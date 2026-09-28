@@ -2,6 +2,8 @@
 
 # Real-Time Translated Voice Calling App with Consent-Based Voice Cloning 🎙️
 
+- <img width="2606" height="1604" alt="image" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
+
 A local, offline proof-of-concept demonstrating real-time bidirectional translated voice calls with zero-shot voice cloning, fully accelerated on **Apple Silicon (M1/M2/M3/M4 MacBook Pro)**.
 
 - **Zero Cloud / Paid APIs**: Runs 100% locally.
@@ -9,7 +11,7 @@ A local, offline proof-of-concept demonstrating real-time bidirectional translat
 - **Bidirectional Calling**: User A speaks **German** ➔ User B hears **English** in User A's cloned voice; User B speaks **English** ➔ User A hears **German** in User B's cloned voice.
 - **Utterance-Based Translation**: Speak ➔ Pause/Release ➔ STT ➔ NMT ➔ Voice Clone TTS ➔ Remote Playback.
 
-- <img width="2606" height="1604" alt="image" src="https://github.com/user-attachments/assets/10b9c7c1-dd2e-4490-8d04-54e7575128d6" />
+
 
 
 ---
